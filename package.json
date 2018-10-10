@@ -1,0 +1,21 @@
+{
+  "name": "inconvergent-sandbox",
+  "version": "0.0.1",
+  "description": "p5js sandbox",
+  "main": "server.js",
+  "scripts": {
+    "start": "PORT=4000 node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "p5": "^0.7.2"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "keywords": [
+    "node",
+    "express"
+  ],
+  "license": "MIT"
+}
