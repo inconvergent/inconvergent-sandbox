@@ -1,112 +1,11 @@
-/* global createCanvas, mouseIsPressed, fill, mouseX, mouseY, ellipse, 
+/* global createCanvas, mouseIsPressed, fill, mouseX, mouseY, ellipse,
    windowHeight, windowWidth, cos, sin, random, vec, rndInCirc, sqrt, PI, TWO_PI
 */
 
-class vec {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    // this.anim = anim;
-  }
 
-  pt() {
-    return {x: this.x, y: this.y};
-  }
 
-  // setAnim(a) {
-  //   this.anim = a;
-  //   return this;
-  // }
+// MATH
 
-  slide(n, to) {
-    const start = this.copy();
-    const stp = to.sub(this);
-    return this.setAnim({
-      type: 'slide',
-      curr: 0.0,
-      inc: 1.0/n,
-      fx: s => start.add(stp.scale(ease(s)))});
-  }
-  
-  draw(rad) {
-    ellipse(this.x, this.y, rad, rad);
-  }
-
-  // doAnim() {
-  //   if (this.anim) {
-  //     const anim = this.anim;
-  //     let newVec = anim.fx(anim.curr);
-  //     if (anim.curr < 1) {
-  //       anim.curr += anim.inc;
-  //       newVec.setAnim(anim);
-  //     }
-  //     return newVec;
-  //   }
-  //   return this;
-  // }
-
-  copy() {
-    return new vec(this.x, this.y);
-  }
-
-  sub(v) {
-    return new vec(this.x - v.x, this.y - v.y);
-  }
-  
-  neg() {
-    return new vec(-this.x, -this.y);
-  }
-
-  add(v) {
-    return new vec(this.x + v.x, this.y + v.y);
-  }
-
-  scale(s) {
-    return new vec(this.x*s, this.y*s);
-  }
-
-  vscale(v) {
-    return new vec(this.x*v.x, this.y*v.y);
-  }
-
-  len() {
-    const d2 = Math.pow(this.x, 2.0) + Math.pow(this.y, 2.0);
-    if (d2 > 0.0) {
-      return Math.sqrt(d2);
-    }
-    return 0.0;
-  }
-
-  norm() {
-    const d2 = Math.pow(this.x, 2.0) + Math.pow(this.y, 2.0);
-    if (d2 > 0.0) {
-      const d = Math.sqrt(d2);
-      return new vec(this.x/d, this.y/d);
-    }
-    return new vec(0.0, 0.0);
-  }
-}
-
-class ln {
-  constructor(a, b) {
-    this.a = a;
-    this.b = b;
-  }
-  
-  len() {
-    return this.a.sub(this.b).len();
-  }
-  
-  draw() {
-    line(this.a.x, this.a.y, this.b.x, this.b.y);
-  }
-}
-
-function ease(t) {
-  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
-}
-
-// LINEAR
 function linspace(n, mi, ma) {
   let res = [];
   const s = (ma - mi) / (n-1);
@@ -118,29 +17,95 @@ function linspace(n, mi, ma) {
   return res;
 }
 
+function ease(t) {
+  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
+}
+
+
+// VEC
+
+function vec(x, y) {
+  return createVector(x, y || x);
+}
+
+function zero() {
+  return vec(0);
+}
+
+function box(w, h, v) {
+   return [vec(v.x - w, v.y - h),
+           vec(v.x + w, v.y - h),
+           vec(v.x + w, v.y + h),
+           vec(v.x - w, v.y + h),
+           vec(v.x - w, v.y - h)];
+}
+
+function intersect(aa, bb) {
+  const a0 = aa[0];
+  const a1 = aa[1];
+  const b0 = bb[0];
+  const b1 = bb[1];
+
+  const sa = a1.copy().sub(a0);
+  const sb = b1.copy().sub(b0);
+  const u = (-sb.x * sa.y) + (sa.x * sb.y);
+
+  if (Math.abs(u) < 0.0000001) {
+    // almost parallel;
+    return {intersect: false, p: null, q: null};
+  }
+
+  const q =  ((-sa.y * (a0.x - b0.x)) +
+              ( sa.x * (a0.y - b0.y))) / u;
+
+  const p =  ((sb.x * (a0.y - b0.y)) -
+              (sb.y * (a0.x - b0.x))) / u;
+
+  return {intersect: (p >= 0 && p <= 1 && q >= 0 && q <= 1), p, q};
+}
+
+
+// function rot(s, angle) {
+//   const r = Math.atan2(s.y, s.x) + angle;
+//   return vec(Math.cos(r), Math.sin(r));
+// }
+
+// function angleToVec(a) {
+//   return vec(Math.cos(a), Math.sin(a));
+// }
 
 
 // RANDOM
 
-function rndInCirc(rad, xy=new vec(0.0, 0.0)) {
+let rnd = {};
+
+rnd.inCirc = function(rad, xy=vec(0.0)) {
   let a = random(TWO_PI);
   let r = rad * sqrt(random(1));
-  return new vec(xy.x + r * cos(a), xy.y + r * sin(a));
+  return vec(xy.x + r * cos(a), xy.y + r * sin(a));
+};
+
+
+
+// DRAW
+
+//let drawing = {};
+
+function drawPath(path) {
+  noFill();
+  beginShape();
+  path.forEach(v => {
+    if (v) {
+      vertex(v.x, v.y);
+    }});
+  endShape();
 }
 
 
-// export function box(w, h, v) {
-//   return [new vec(v.x - w, v.y - h),
-//           new vec(v.x + w, v.y - h),
-//           new vec(v.x + w, v.y + h),
-//           new vec(v.x - w, v.y + h),
-//           new vec(v.x - w, v.y - h)];}
+function drawCirc(path, rad=10) {
+  path.forEach(v => {
+    if (v) {
+      ellipse(v.x, v.y, rad, rad);
+    }});
+}
 
-// export function rot(s, angle) {
-//   const r = Math.atan2(s.y, s.x) + angle;
-//   return new vec(Math.cos(r), Math.sin(r));
-// }
-
-// export function angleToVec(a) {
-//   return new vec(Math.cos(a), Math.sin(a));
-// }
