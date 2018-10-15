@@ -19,6 +19,7 @@ function setup(){
   win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
+  strokeWeight(2);
 
   state = {
     mouse: null,
@@ -91,7 +92,6 @@ function draw(){
 
   clear();
 
-  strokeWeight(2);
 
   drawPath(state.path.map(i => state.verts[i]));
 
