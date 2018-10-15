@@ -27,7 +27,7 @@ function setup(){
     inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
-  init(win.copy().mult(0.1), win.copy().mult(0.5));
+  init(win.copy().mult(0.05), win.copy().mult(0.5));
 }
 
 function lineDistance(mouse){
@@ -61,7 +61,12 @@ function extrudeEdge(pi){
   const angleVec = vb.copy().sub(va).normalize();
   const angle = Math.atan2(angleVec.y, angleVec.x)-HALF_PI;
 
-  const v = p5.Vector.fromAngle(angle).setMag(rndBetween(20, 100));
+  const mag = rndBetween(20, 100);
+  const v = p5.Vector.fromAngle(angle).setMag(mag);
+
+  if (random()<0.4){
+    v.add(rndInCirc(mag*0.7));
+  }
 
   state.verts.push(va.copy().add(v));
   state.verts.push(vb.copy().add(v));
@@ -70,7 +75,6 @@ function extrudeEdge(pi){
   newPath.push(numVerts);
   newPath.push(numVerts+1);
   newPath.push.apply(newPath, state.path.slice(pi+1));
-
   state.path = newPath;
 }
 
@@ -86,6 +90,8 @@ function draw(){
   const mouse = vec(mouseX, mouseY);
 
   clear();
+
+  strokeWeight(2);
 
   drawPath(state.path.map(i => state.verts[i]));
 
