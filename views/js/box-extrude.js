@@ -29,7 +29,6 @@ function setup() {
 
 function draw() {
   const mouse = vec(mouseX, mouseY);
-  console.log(mouse);
 
   clear();
 
