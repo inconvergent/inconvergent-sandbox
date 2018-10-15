@@ -62,9 +62,9 @@ function draw() {
 
   state.lines.forEach(p => drawPath(p));
 
-  fill('rgb(0, 255, 0)');
+  //fill('rgb(0, 255, 0)');
   //state.lines.forEach(p => drawCirc(p, 10));
-  noFill();
+  //noFill();
 
   state.mouse = mouse;
 }
