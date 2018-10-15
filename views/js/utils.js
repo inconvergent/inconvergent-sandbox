@@ -37,7 +37,7 @@ function ease(t){
 
 // VEC
 
-function vec(x, y){
+function vec(x, y=null){
   return createVector(x, y || x);
 }
 
@@ -45,10 +45,14 @@ function zero(){
   return vec(0);
 }
 
-function getBox(w, h, v){
-   return [vec(v.x - w, v.y - h), vec(v.x + w, v.y - h),
-           vec(v.x + w, v.y + h), vec(v.x - w, v.y + h),
-           vec(v.x - w, v.y - h)];
+function getBox(w, h, v, closed=false){
+  let res = [vec(v.x - w, v.y - h), vec(v.x + w, v.y - h),
+             vec(v.x + w, v.y + h), vec(v.x - w, v.y + h)];
+
+  if (closed){
+    res.push(res[0].copy());
+  }
+  return res;
 }
 
 function intersect(aa, bb){
@@ -61,8 +65,9 @@ function intersect(aa, bb){
   const sb = b1.copy().sub(b0);
   const u = (-sb.x * sa.y) + (sa.x * sb.y);
 
-  // almost parallel;
-  if (Math.abs(u) < 0.00000001){
+  // this is just a safe-guard so we do not divide by zero below.
+  // it is not a good way to test for parallel lines
+  if (Math.abs(u) <= 0){
     return {intersect: false, p: null, q: null};
   }
 
@@ -98,6 +103,10 @@ function rndInCirc(rad, xy=vec(0.0)){
   const a = random(TWO_PI);
   const r = rad * sqrt(random(1));
   return vec(xy.x + r * cos(a), xy.y + r * sin(a));
+}
+
+function rndBetween(a, b){
+  return a + random(b-a);
 }
 
 

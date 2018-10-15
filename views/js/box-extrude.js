@@ -7,14 +7,10 @@ let state, mid, win;
 
 
 function init(s, xy){
-  //state.lines = linspace(n, 100, 900).map(x =>
-  //  [vec(x, 100), vec(x, 900)]);
-  //
   state.verts = getBox(s.x, s.y, xy);
-  state.path = getRange(state.verts.length-1);
+  state.path = getRange(state.verts.length);
   state.path.push(0);
   console.log(state);
-
 }
 
 
@@ -27,6 +23,7 @@ function setup(){
   state = {
     mouse: null,
     win,
+    selectedEdge: null,
     inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
@@ -51,6 +48,40 @@ function lineDistance(mouse){
   return pi;
 }
 
+
+function extrudeEdge(pi){
+  const numVerts = state.verts.length;
+  const numEdges = state.path.length;
+
+  const a = state.path[pi];
+  const b = state.path[pi+1];
+  const va = state.verts[a];
+  const vb = state.verts[b];
+
+  const angleVec = vb.copy().sub(va).normalize();
+  const angle = Math.atan2(angleVec.y, angleVec.x)-HALF_PI;
+
+  const v = p5.Vector.fromAngle(angle).setMag(rndBetween(20, 100));
+
+  state.verts.push(va.copy().add(v));
+  state.verts.push(vb.copy().add(v));
+
+  let newPath = state.path.slice(0, pi+1);
+  newPath.push(numVerts);
+  newPath.push(numVerts+1);
+  newPath.push.apply(newPath, state.path.slice(pi+1));
+
+  state.path = newPath;
+}
+
+
+function mouseClicked(){
+  if (state.selectedEdge !== null){
+    extrudeEdge(state.selectedEdge);
+    state.selectedEdge = null;
+  }
+}
+
 function draw(){
   const mouse = vec(mouseX, mouseY);
 
@@ -58,15 +89,11 @@ function draw(){
 
   drawPath(state.path.map(i => state.verts[i]));
 
+  state.selectedEdge = null;
+
   if (state.inside(mouse)){
-    const pi = lineDistance(mouse);
+    state.selectedEdge = lineDistance(mouse);
   }
 
-  //state.lines.forEach(p => drawPath(p));
-
-  //fill('rgb(0, 255, 0)');
-  //state.lines.forEach(p => drawCirc(p, 10));
-  //noFill();
-
-  //state.mouse = mouse;
+  drawCirc(state.verts, 10);
 }
