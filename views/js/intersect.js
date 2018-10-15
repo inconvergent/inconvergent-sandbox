@@ -6,13 +6,13 @@ let state, mid, win;
 
 
 
-function init(n) {
+function init(n){
   state.lines = linspace(n, 100, 900).map(x =>
     [vec(x, 100), vec(x, 900)]);
 }
 
 
-function setup() {
+function setup(){
   //win = vec(windowHeight, windowWidth);
   win = vec(1000, 1000);
   angleMode(RADIANS);
@@ -27,12 +27,12 @@ function setup() {
   init(100);
 }
 
-function draw() {
+function draw(){
   const mouse = vec(mouseX, mouseY);
 
   clear();
 
-  if (state.inside(mouse) && state.inside(state.mouse)) {
+  if (state.inside(mouse) && state.inside(state.mouse)){
 
     const cut = [mouse, state.mouse];
     const r = cut[1].copy(cut[0]).mag()*0.01;
@@ -42,7 +42,7 @@ function draw() {
     let newLines = [];
     state.lines.forEach(p => {
       const isect = intersect(cut, p);
-      if (isect.intersect) {
+      if (isect.intersect){
 
         //const v1 = p5.Vector.fromAngle(random(TWO_PI)).setMag(20);
         //const v2 = p5.Vector.fromAngle(random(TWO_PI)).setMag(20);
