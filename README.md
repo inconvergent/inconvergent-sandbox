@@ -1,4 +1,7 @@
-Inconvergent P5js Sandbox
+Inconvergent Sandbox
 =========
 
-interactive demo thing.
+Interactive demos written in P5.js.
+
+See the code live on Glitch at: https://inconvergent-sandbox.glitch.me/
+
