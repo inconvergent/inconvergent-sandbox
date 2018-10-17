@@ -92,7 +92,6 @@ function draw(){
 
   clear();
 
-
   drawPath(state.path.map(i => state.verts[i]));
 
   state.selectedEdge = null;
