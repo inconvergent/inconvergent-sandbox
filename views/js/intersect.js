@@ -9,6 +9,10 @@ let state, mid, win;
 function init(n){
   state.lines = linspace(n, 100, 900).map(x =>
     [vec(x, 100), vec(x, 900)]);
+
+  Array.prototype.push.apply(state.lines ,
+    linspace(n, 100, 900).map(y =>
+      [vec(100, y), vec(900, y)]));
 }
 
 
