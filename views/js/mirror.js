@@ -41,20 +41,22 @@ function init(n, m){
 function reflect(mirrors, v){
   let d = 100000;
   let o = null;
-  let ind = null;
-  let mirror = null;
-  mirrors.forEach((m, i) => {
-    const dst = m.dist(v);
-    if (dst < d){
-      d = dst;
-      o = m.copy().sub(v);
-      mirror = m;
+  let s = 0;
+  let ind = -1;
+
+  for (let i=0; i<state.mirrors.length-1; i++){
+    const mirror = [state.mirrors[i], state.mirrors[i+1]];
+    const res = linePointDistance(mirror, v);
+    if (res.dst<d){
+      o = p5.Vector.lerp(mirror[0], mirror[1], res.s);
+      d = res.dst;
+      s = res.s;
       ind = i;
-    }});
-  if (ind == (mirrors.length-1)){
-    //return mirror.copy().add(o);
-    return v.copy().add(o.normalize()
-            .mult(state.direction*Math.sqrt(d)));
+    }
+  }
+
+  if (ind===(state.mirrors.length-2) && (s>0.0 && s<1.0)){
+    return o.copy().add(o.copy().sub(v));
   }
   return v;
 }
@@ -64,9 +66,10 @@ function mouseClicked(){
   if (state.mouse !== null){
     state.mirrors.push(state.mouse);
     //state.mirrors = [state.mouse.copy()];
-    state.verts = state.verts.map(v =>
-      reflect(state.mirrors, v));
-    state.direction *= -1;
+    if (state.mirrors.length > 1) {
+      state.verts = state.verts.map(v =>
+        reflect(state.mirrors, v));
+    }
   }
   console.log(state.mouse);
 }
@@ -80,7 +83,6 @@ function setup(){
 
   state = {
     mouse: null,
-    direction: 1,
     win,
     lightColor: color('rgba(0, 0, 0, 0.5)'),
     cyanColor: color('rgb(0, 180, 180)'),
@@ -105,11 +107,12 @@ function draw(){
   drawCirc(state.verts, 2);
 
   //stroke(state.lightColor);
-  state.edges.forEach(e =>
-    drawPath(e.map(v => state.verts[v])));
+  //state.edges.forEach(e =>
+  //  drawPath(e.map(v => state.verts[v])));
 
   stroke(state.cyanColor);
   strokeWeight(2);
+  drawPath(state.mirrors);
   drawCirc(state.mirrors, 10);
 
 }
