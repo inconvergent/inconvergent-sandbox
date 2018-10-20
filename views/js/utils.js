@@ -7,6 +7,8 @@
 // MATH
 
 function linspace(n, mi, ma){
+  // get n numbers evenly distributed between (mi, ma).
+  // includes the end values.
   let res = [];
   const s = (ma - mi) / (n-1);
   let y = mi;
@@ -18,6 +20,7 @@ function linspace(n, mi, ma){
 }
 
 function getRange(a, b=null){
+  // get integers from 0 to a-1, or from a to b-1 if b is not null.
   if (b === null){
     b = a;
     a = 0;
@@ -30,25 +33,30 @@ function getRange(a, b=null){
   return res;
 }
 
-function ease(t){
-  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
-}
+//function ease(t){
+//  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
+//}
 
 
 // VEC
 
 function vec(x, y=null){
+  // create a vector (x, y). if y is not provided, the vector will be
+  // (x, x).
   return createVector(x, y || x);
 }
 
 function zero(){
+  // zero vector
   return vec(0);
 }
 
-function getBox(w, h, v, closed=false){
+function getBox(ww, hh, v, closed=false){
+  // returns a box of width ww and height hh, centered at v.
+  const w = ww*0.5;
+  const h = hh*0.5;
   let res = [vec(v.x - w, v.y - h), vec(v.x + w, v.y - h),
              vec(v.x + w, v.y + h), vec(v.x - w, v.y + h)];
-
   if (closed){
     res.push(res[0].copy());
   }
@@ -56,6 +64,10 @@ function getBox(w, h, v, closed=false){
 }
 
 function intersect(aa, bb){
+  // tests whether lines aa and bb intersect.
+  // if they intersect, it returns p and q so that
+  // p5.Vector.lerp(aa[0], aa[1], p), and
+  // p5.Vector.lerp(bb[0], bb[1], q) is the intersection point.
   const a0 = aa[0];
   const a1 = aa[1];
   const b0 = bb[0];
@@ -81,6 +93,9 @@ function intersect(aa, bb){
 
 
 function linePointDistance(line, v){
+  // find the closest point on line to point v.
+  // returns the distance (dst) and s, so that
+  // p5.Vector.lerp(line[0], line[1], s) is the point on line closest to v.
   const va = line[0];
   const vb = line[1];
   const l2 = Math.pow(p5.Vector.dist(va, vb), 2.0);
@@ -100,30 +115,61 @@ function linePointDistance(line, v){
 // RANDOM
 
 function rndInCirc(rad, xy=vec(0.0)){
+  // return a p5.Vector uniformly distributed in a circle with radius rad,
+  // centered at xy.
   const a = random(TWO_PI);
   const r = rad * sqrt(random(1));
   return vec(xy.x + r * cos(a), xy.y + r * sin(a));
 }
 
 function rndBetween(a, b){
+  // return a random number in range (a, b).
   return a + random(b-a);
+}
+
+function prob(p, dofx, elsefx=null){
+  //execute dofx with a probability of p,
+  //or elsefx with a probability of (1-p)
+  if (random()<p){
+    return dofx();
+  } else if (elsefx !== null) {
+    return elsefx();
+  }
+  return null;
+}
+
+function either(p, dofx, elsefx=null){
+  //execute either dofx or elsefx with a probability of 0.5
+  return prob(0.5, dofx, elsefx);
 }
 
 
 // DRAW
 
-function drawPath(path){
+function drawPath(path, closed=false){
+  //draw a path as a list of p5.Vector.
+  //falsy elements are ignored.
+  //
+  //if closed === true a line will be drawn between the first and last elements
+  //in path.
+
   noFill();
   beginShape();
   path.forEach(v => {
     if (v){
       vertex(v.x, v.y);
     }});
+  const first = path[0];
+  if (closed && first){
+    vertex(first.x, first.y);
+  }
   endShape();
 }
 
 
 function drawCirc(path, rad=10){
+  // draw circles of radius rad for every p5.Vector in path.
+  // ignores falsy elements.
   path.forEach(v => {
     if (v){
       ellipse(v.x, v.y, rad, rad);

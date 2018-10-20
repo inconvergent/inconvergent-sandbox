@@ -28,7 +28,7 @@ function setup(){
     inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
-  init(win.copy().mult(0.05), win.copy().mult(0.5));
+  init(win.copy().mult(0.1), win.copy().mult(0.5));
 }
 
 function lineDistance(mouse){
