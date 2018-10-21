@@ -6,7 +6,7 @@ let state, mid, win;
 
 
 function createBranch(pos, angle, steps=0){
-  return {pos: [pos.copy()], angle: angle.copy(), steps};
+  return {pos: [pos.copy()], angle: [angle.copy()], steps};
 }
 
 
@@ -39,10 +39,10 @@ function animate(){
     .forEach(b => {
     // branches that have fewer than maxSteps are still active
     if (b.steps<maxSteps){
-      b.pos.push(last(b.pos).copy().add(b.angle));
+      b.pos.push(last(b.pos).copy().add(last(b.angle)));
       // wiggle the angle. the higher the step count, the greater the
       // potential change in angle
-      b.angle = rndAngle(b.steps/maxSteps*0.1, b.angle);
+      b.angle.push(rndAngle(b.steps/maxSteps*0.1, last(b.angle)));
       // increment steps
       b.steps += 1;
       // create a new branch with a certain probability
@@ -50,13 +50,13 @@ function animate(){
       // that a higher step count increases the probability
       prob((maxSteps-b.steps)/maxSteps*0.009, () =>
         state.branches.push(
-          createBranch(last(b.pos), b.angle.copy(), b.steps)));
+          createBranch(last(b.pos), last(b.angle).copy(), b.steps)));
     }
   });
 }
 
 function drawBranch(b){
-  const angle = b.angle;
+  const angle = last(b.angle);
   const left = rotAngle(angle, HALF_PI).mult(20);
   const right = rotAngle(angle, -HALF_PI).mult(20);
   const n = b.pos.length-2;
@@ -81,6 +81,5 @@ function draw(){
 
   strokeWeight(3);
 
-  //state.branches.map(b => b.pos).forEach(b => drawPath(b));
   state.branches.forEach(b => drawBranch(b));
 }
