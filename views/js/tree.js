@@ -10,7 +10,6 @@ function createBranch(pos, angle, steps=0){
 }
 
 
-
 function init(pos){
   angle = vec(0, -1);
   state.branches = [createBranch(pos, angle)];
@@ -21,49 +20,67 @@ function setup(){
   win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
-  noFill();
 
   state = {
-    mouse: null,
     win,
-    inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
+    branches: null,
+    maxSteps: 850,
+    //inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
-  const bottom = vec(win.x*0.5, 900);
-  init(bottom);
-}
-
-function last(l){
-  return l[l.length-1];
+  // crate tree in the middle of the canvas, near the bottom.
+  init(vec(win.x*0.5, 950));
 }
 
 function animate(){
-
-  // animate remaining branches
+  // animate active remaining branches
+  const maxSteps = state.maxSteps;
   state.branches
     .forEach(b => {
-    if (b.steps<800){
+    // branches that have fewer than maxSteps are still active
+    if (b.steps<maxSteps){
       b.pos.push(last(b.pos).copy().add(b.angle));
-      b.angle.add(rndInCirc(b.steps/800*0.2)).normalize();
+      // wiggle the angle. the higher the step count, the greater the
+      // potential change in angle
+      b.angle = rndAngle(b.steps/maxSteps*0.1, b.angle);
+      // increment steps
       b.steps += 1;
-      prob((800-b.steps)/800*0.009, () =>
-        state.branches.push(createBranch(last(b.pos), b.angle.copy(), b.steps)))
+      // create a new branch with a certain probability
+      // the probability depends on the number of steps so
+      // that a higher step count increases the probability
+      prob((maxSteps-b.steps)/maxSteps*0.009, () =>
+        state.branches.push(
+          createBranch(last(b.pos), b.angle.copy(), b.steps)));
     }
   });
 }
 
+function drawBranch(b){
+  const angle = b.angle;
+  const left = rotAngle(angle, HALF_PI).mult(20);
+  const right = rotAngle(angle, -HALF_PI).mult(20);
+  const n = b.pos.length-2;
+
+  const leftPath = b.pos.slice(n).map(v => v.copy().add(left));
+  const rightPath = b.pos.slice(n).map(v => v.copy().add(right)).reverse();
+
+  fill(color('rgb(255,0,255)'));
+  noStroke();
+  drawPath(leftPath.concat(rightPath));
+
+  stroke(color('rgb(0,0,0)'));
+  noFill();
+  drawPath(leftPath);
+  drawPath(rightPath);
+}
+
 function draw(){
-  const mouse = vec(mouseX, mouseY);
-
-  clear();
-
+  //const mouse = vec(mouseX, mouseY);
+  //clear();
   animate();
 
-  strokeWeight(50);
-  stroke(color('rgba(0, 0, 0, 0.5)'))
+  strokeWeight(3);
 
-  state.branches
-       .map(b => b.pos)
-       .forEach(b => drawPath(b));
-
+  //state.branches.map(b => b.pos).forEach(b => drawPath(b));
+  state.branches.forEach(b => drawBranch(b));
 }

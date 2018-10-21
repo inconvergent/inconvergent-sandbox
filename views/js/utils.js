@@ -33,6 +33,12 @@ function getRange(a, b=null){
   return res;
 }
 
+function last(l){
+  // get last element of l, (or null)
+  return l.length>0 ? l[l.length-1] : null ;
+}
+
+
 //function ease(t){
 //  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
 //}
@@ -111,6 +117,10 @@ function linePointDistance(line, v){
   return {dst: p5.Vector.dist(v, xy), s: t, xy};
 }
 
+function rotAngle(a, r){
+  return p5.Vector.fromAngle(Math.atan2(a.y, a.x)+r);
+}
+
 
 // RANDOM
 
@@ -122,9 +132,23 @@ function rndInCirc(rad, xy=vec(0.0)){
   return vec(xy.x + r * cos(a), xy.y + r * sin(a));
 }
 
+function random2(a){
+  // get a number between (-a, +a)
+  return a*(1-2*random());
+}
+
+
 function rndBetween(a, b){
   // return a random number in range (a, b).
   return a + random(b-a);
+}
+
+function rndAngle(r=PI, a=null){
+  // make a random angle in range (-r, +r) around a.
+  a = a ? a.copy().normalize() : vec(1, 0);
+  const angle = random2(r);
+  const around = Math.atan2(a.y, a.x);
+  return p5.Vector.fromAngle(angle+around);
 }
 
 function prob(p, dofx, elsefx=null){
@@ -153,7 +177,6 @@ function drawPath(path, closed=false){
   //if closed === true a line will be drawn between the first and last elements
   //in path.
 
-  noFill();
   beginShape();
   path.forEach(v => {
     if (v){
