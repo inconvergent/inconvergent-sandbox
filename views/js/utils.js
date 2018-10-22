@@ -33,9 +33,10 @@ function getRange(a, b=null){
   return res;
 }
 
-function last(l){
+function last(l, i=1){
   // get last element of l, (or null)
-  return l.length>0 ? l[l.length-1] : null ;
+  // use i to get second last element and so forth.
+  return l.length>(i-1) ? l[l.length-i] : null;
 }
 
 

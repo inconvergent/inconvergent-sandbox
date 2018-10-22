@@ -5,8 +5,8 @@
 let state, mid, win;
 
 
-function createBranch(pos, angle, steps=0){
-  return {pos: [pos.copy()], angle: [angle.copy()], steps};
+function createBranch(pos, angle, steps=0, width=1){
+  return {pos: [pos.copy()], angle: [angle.copy()], steps, width: [width]};
 }
 
 
@@ -25,7 +25,6 @@ function setup(){
     win,
     branches: null,
     maxSteps: 850,
-    //inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
   // crate tree in the middle of the canvas, near the bottom.
@@ -39,35 +38,66 @@ function animate(){
     .forEach(b => {
     // branches that have fewer than maxSteps are still active
     if (b.steps<maxSteps){
-      b.pos.push(last(b.pos).copy().add(last(b.angle)));
-      // wiggle the angle. the higher the step count, the greater the
-      // potential change in angle
-      b.angle.push(rndAngle(b.steps/maxSteps*0.1, last(b.angle)));
+      // wiggle the angle. the wider the branch the less change in angle
+      const newAngle = rndAngle((1-last(b.width))*0.1, last(b.angle));
+      b.angle.push(newAngle);
+
+      // step branch
+      b.pos.push(last(b.pos).copy().add(newAngle));
+
+      // decrease width
+      b.width.push(Math.max(0, last(b.width)*0.997));
+
       // increment steps
       b.steps += 1;
       // create a new branch with a certain probability
-      // the probability depends on the number of steps so
-      // that a higher step count increases the probability
-      prob((maxSteps-b.steps)/maxSteps*0.009, () =>
+      // the probability depends on the width, so that thinner branches
+      // are more likely to create new branches
+      prob((1-last(b.width))*0.01, () =>
         state.branches.push(
-          createBranch(last(b.pos), last(b.angle).copy(), b.steps)));
+          createBranch(last(b.pos), last(b.angle).copy(), b.steps,
+                       last(b.width)*0.72)));
     }
   });
 }
 
+
+function offsetAngle(tail, angleTail, widthTail, a){
+  return tail.map((v, i) => {
+    const offset = rotAngle(angleTail[i], a).mult(widthTail[i]);
+    return v.copy().add(offset);
+  });
+}
+
+
 function drawBranch(b){
-  const angle = last(b.angle);
-  const left = rotAngle(angle, HALF_PI).mult(20);
-  const right = rotAngle(angle, -HALF_PI).mult(20);
-  const n = b.pos.length-2;
+  if (b.pos.length<2){
+    return;
+  }
 
-  const leftPath = b.pos.slice(n).map(v => v.copy().add(left));
-  const rightPath = b.pos.slice(n).map(v => v.copy().add(right)).reverse();
+  // two last elements of b.pos
+  //const n = b.pos.length-2;
 
-  fill(color('rgb(255,0,255)'));
+  // or draw all parts of branch
+  const n = 0;
+
+  const tail = b.pos.slice(n);
+  const angleTail = b.angle.slice(n);
+  const widthTail = b.width.slice(n).map(w => w*40);
+
+  const width = last(b.width);
+
+  // offset paths to both sides
+  const leftPath = offsetAngle(tail, angleTail, widthTail, HALF_PI);
+  // reverse, because we need to form a polygon
+  const rightPath = offsetAngle(tail, angleTail, widthTail, -HALF_PI).reverse();
+
+  // draw a background
+  fill(color('rgb(255,255,255)'));
   noStroke();
   drawPath(leftPath.concat(rightPath));
 
+  // draw outlines
   stroke(color('rgb(0,0,0)'));
   noFill();
   drawPath(leftPath);
@@ -75,11 +105,8 @@ function drawBranch(b){
 }
 
 function draw(){
-  //const mouse = vec(mouseX, mouseY);
-  //clear();
+  clear();
   animate();
-
-  strokeWeight(3);
-
+  strokeWeight(2);
   state.branches.forEach(b => drawBranch(b));
 }
