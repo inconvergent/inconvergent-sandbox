@@ -3,7 +3,7 @@
 
 here=`pwd`
 cd ..
-rm -rf views
+rm -rf www
 cd $here
 mv * ..
 cd ..
