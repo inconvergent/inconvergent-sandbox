@@ -2,7 +2,7 @@
    windowHeight, windowWidth, cos, sin, random, vec, rndInCirc
 */
 
-let state, mid, win;
+let state, win;
 
 
 function init(n, rad, xy){
@@ -10,7 +10,8 @@ function init(n, rad, xy){
   for (let i=0; i<n; i++){
     state.bodies.push([{
       pos: rndInCirc(rad, xy=xy),
-      vel: rndInCirc(10)}]);
+      vel: rndInCirc(10)}
+    ]);
   }
 }
 
@@ -20,12 +21,13 @@ function setup(){
   win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
-  strokeWeight(2);
+  noFill();
 
   state = {
     mouse: null,
     numBodies: 10,
     stpSize: 0.01,
+    maxLength: 100,
     win,
   };
 
@@ -35,7 +37,7 @@ function setup(){
 function step(bodies){
   const curr = bodies.map(b => last(b));
   for (let i=0 ; i<state.numBodies; i++){
-    let acc = vec(0.0);
+    const acc = vec(0.0);
     for (let j=0 ; j<state.numBodies; j++){
       if (i===j){
         continue;
@@ -54,16 +56,24 @@ function step(bodies){
     const pos = curr[i].pos.copy().add(vel.copy().mult(state.stpSize));
     const o = {pos, vel};
     bodies[i].push(o);
+
+    if (bodies[i].length>state.maxLength){
+      bodies[i] = bodies[i].slice(bodies[i].length-state.maxLength);
+    }
   }
 }
 
 
 function draw(){
-
   clear();
 
   step(state.bodies);
 
+  strokeWeight(3);
   drawCirc(state.bodies.map(b => last(b).pos));
 
+  strokeWeight(1);
+  state.bodies.forEach(his => {
+    drawPath(his.map(b => b.pos));
+  });
 }
