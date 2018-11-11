@@ -31,12 +31,29 @@ function setup(){
     stpSize: 0.01,
     maxLength: 100,
     win,
+    inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
   };
 
-  init(state.numBodies, 150, win.copy().mult(0.5));
+  init(state.numBodies, 300, win.copy().mult(0.5));
 }
 
-function step(trails){
+function getAcc(a, b){
+  // the the vector from a to b
+  const dx = b.copy().sub(a);
+  // normalized the vector (so it has length 1)
+  const ndx = dx.copy().normalize();
+
+  // distance between i and j
+  let dst = dx.mag();
+  if (dst<0.01){
+    dst = 0.01;
+  }
+  // sum up the acceleration between i and j
+  return ndx.mult(1.0/dst*dst);
+}
+
+
+function step(trails, mouse){
   // most recent position of every body
   const curr = trails.map(b => last(b));
 
@@ -48,24 +65,17 @@ function step(trails){
       if (i===j){
         continue;
       }
-      // the the vector between i and j
-      const dx = curr[j].pos.copy().sub(curr[i].pos);
-      // normalized the vector (so it has length 1)
-      const ndx = dx.copy().normalize();
+      acc.add(getAcc(curr[i].pos, curr[j].pos));
+    }
 
-      // distance between i and j
-      let dst = dx.mag();
-      if (dst<0.01){
-        dst = 0.01;
-      }
-
-      // sum up the acceleration between i and j
-      acc.add(ndx.mult(1.0/dst*dst));
+    if (state.inside(mouse)){
+      acc.add(getAcc(curr[i].pos, mouse).mult(5));
     }
 
     // the new velocity is the old velocity + the acceleration +
     // a little bit of randomness
-    const vel = curr[i].vel.copy().add(acc).add(rndInCirc(1));
+    // multiply by 0.999 to keep the velocity from growing too high.
+    const vel = curr[i].vel.copy().mult(0.999).add(acc).add(rndInCirc(1));
     // new position is the old position + the velocity (multiplied by step size)
     const pos = curr[i].pos.copy().add(vel.copy().mult(state.stpSize));
     // add the new position to the trail
@@ -82,7 +92,9 @@ function step(trails){
 function draw(){
   clear();
 
-  step(state.trails);
+  const mouse = vec(mouseX, mouseY);
+
+  step(state.trails, mouse);
 
   // draw bodies (only the last position of each trail)
   strokeWeight(3);
