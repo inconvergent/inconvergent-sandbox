@@ -2,8 +2,7 @@
    windowHeight, windowWidth, cos, sin, random, vec, rndInCirc
 */
 
-let state, mid, win;
-
+let state;
 
 
 function init(n){
@@ -17,8 +16,7 @@ function init(n){
 
 
 function setup(){
-  //win = vec(windowHeight, windowWidth);
-  win = vec(1000, 1000);
+  const win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
   strokeWeight(2);
@@ -39,37 +37,57 @@ function draw(){
 
   if (state.inside(mouse) && state.inside(state.mouse)){
 
+    // cut from the previous position to current positon (mouse)
     const cut = [mouse, state.mouse];
-    const r = cut[1].copy(cut[0]).mag()*0.01;
-    drawPath(cut);
-    drawCirc(cut, r);
+
+    // show position of mouse
+    drawCirc([state.mouse], 15);
 
     let newLines = [];
-    state.lines.forEach(p => {
-      const isect = intersect(cut, p);
+
+    // look for an intersection between cut and every line
+    state.lines.forEach(line => {
+
+      // checks for intersections
+      const isect = intersect(cut, line);
       if (isect.intersect){
 
+        // alternate vectors. try this.
         //const v1 = p5.Vector.fromAngle(random(TWO_PI)).setMag(20);
         //const v2 = p5.Vector.fromAngle(random(TWO_PI)).setMag(20);
 
+        // this vector points in the same as the cut vector
+        // (and it has the same length)
         const v1 = cut[1].copy().sub(cut[0]);
+        // this vector points in the oposite direction
         const v2 = v1.copy().mult(-1);
 
-        const mid = p5.Vector.lerp(cut[0], cut[1], isect.p);
-        newLines.push([p[0], mid].map(v => v.copy().add(v1)));
-        newLines.push([mid, p[1]].map(v => v.copy().add(v2)));
+        // lerp is the linear interpolation between its arguments.  that is, it
+        // returns the position p between arguments a (line[0]) and b
+        // (line[1]).  for instance, if p is 0.2, it will return the position
+        // 20 percent from a on the way to b.
+        //
+        // mid is the point on line where cut intersects.
+        const mid = p5.Vector.lerp(line[0], line[1], isect.q);
+
+        // make two new lines, and move each new line in the direction of v1
+        // and v2, respectively
+        newLines.push([line[0], mid].map(v => v.copy().add(v1)));
+        newLines.push([mid, line[1]].map(v => v.copy().add(v2)));
+
       } else {
-        newLines.push(p);
+        // if there is no intersection, keep the original line
+        newLines.push(line);
       }
     });
+
+    // update the state with all new (and old) lines.
     state.lines = newLines ;
   }
 
-  state.lines.forEach(p => drawPath(p));
+  // draw all lines
+  state.lines.forEach(line => drawPath(line));
 
-  //fill('rgb(0, 255, 0)');
-  //state.lines.forEach(p => drawCirc(p, 10));
-  //noFill();
-
+  // store the mose position for the next iteration
   state.mouse = mouse;
 }
