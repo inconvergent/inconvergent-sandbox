@@ -9,7 +9,7 @@
 function linspace(n, mi, ma){
   // get n numbers evenly distributed between (mi, ma).
   // includes the end values.
-  let res = [];
+  const res = [];
   const s = (ma - mi) / (n-1);
   let y = mi;
   for (let i = 0; i < n; i++){
@@ -26,7 +26,7 @@ function getRange(a, b=null){
     a = 0;
   }
 
-  let res = [];
+  const res = [];
   for (let i=a; i<b; i++){
     res.push(i);
   }
@@ -40,10 +40,9 @@ function last(l, i=1){
 }
 
 
-//function ease(t){
-//  return (t<0.5) ? 16.0*t*t*t*t*t : 1.0+16.0*(--t)*t*t*t*t;
-//}
-
+function cross(a, b){
+  return (a.x * b.y) - (b.x * a.y);
+}
 
 // VEC
 
@@ -62,7 +61,7 @@ function getBox(ww, hh, v, closed=false){
   // returns a box of width ww and height hh, centered at v.
   const w = ww*0.5;
   const h = hh*0.5;
-  let res = [vec(v.x - w, v.y - h), vec(v.x + w, v.y - h),
+  const res = [vec(v.x - w, v.y - h), vec(v.x + w, v.y - h),
              vec(v.x + w, v.y + h), vec(v.x - w, v.y + h)];
   if (closed){
     res.push(res[0].copy());
@@ -82,7 +81,7 @@ function intersect(aa, bb){
 
   const sa = a1.copy().sub(a0);
   const sb = b1.copy().sub(b0);
-  const u = (-sb.x * sa.y) + (sa.x * sb.y);
+  const u = cross(sa, sb);
 
   // this is just a safe-guard so we do not divide by zero below.
   // it is not a good way to test for parallel lines
@@ -90,10 +89,9 @@ function intersect(aa, bb){
     return {intersect: false, p: null, q: null};
   }
 
-  const q = ((-sa.y * (a0.x - b0.x)) +
-             ( sa.x * (a0.y - b0.y))) / u;
-  const p = ((sb.x * (a0.y - b0.y)) -
-             (sb.y * (a0.x - b0.x))) / u;
+  const ba = a0.copy().sub(b0);
+  const q = cross(sa, ba)/u;
+  const p = cross(sb, ba)/u;
 
   return {intersect: (p >= 0 && p <= 1 && q >= 0 && q <= 1), p, q};
 }
