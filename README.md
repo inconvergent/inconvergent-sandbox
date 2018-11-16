@@ -40,3 +40,20 @@ to: http://localhost:4000 in your browser.
 
 Download Node.js here https://nodejs.org/en/download/
 
+## References and Further Reading
+
+  - For other writing on generative art: https://inconvergent.net/generative
+    (note that the included code is outdated and unmaintained)
+
+  - So you Want to Build a Generator:
+    http://galaxykate0.tumblr.com/post/139774965871/so-you-want-to-build-a-generator
+
+  - The Nature of Code: https://natureofcode.com/book/
+
+  - P5.js docs https://p5js.org/reference/
+
+  - List of other resources:
+    https://github.com/mattdesl/workshop-generative-art/blob/master/README.md#further-reading
+
+  - Another list https://github.com/terkelg/awesome-creative-coding
+
