@@ -1,8 +1,8 @@
-let express = require('express');
-let app = express();
+const express = require('express');
+const app = express();
 
 app.use(express.static('www'));
 
-let listener = app.listen(process.env.PORT, function () {
+const listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });

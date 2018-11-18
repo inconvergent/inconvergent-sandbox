@@ -5,14 +5,6 @@
 let state, mid, win;
 
 
-function getInd(v){
-  return JSON.stringify(v.sort());
-}
-
-function revInd(v){
-  return JSON.parse(v);
-}
-
 function init(n){
   state.verts = [];
   linspace(n, 50, 950).forEach(x =>
@@ -139,3 +131,4 @@ function draw(){
     drawPath(e.map(v => state.verts[v]));
   });
 }
+

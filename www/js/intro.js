@@ -6,19 +6,17 @@
 let state, mid, win;
 
 
-function init(n) {
-}
-
-
 function setup() {
-  // use a setup function to initialize the canvas, as well as to
+  // setup is automatically executed before everything else.
+  //
+  // use a setup to initialize the canvas, as well as to
   // assign values to other variables you will need for your sketch.
   //
   // p5.js functions must be called from inside setup(), or draw(). otherwise
   // they are undefined
 
   // canvas size
-  win = new vec(1000, 1000);
+  win = vec(1000, 1000);
 
   // the coordinate of the middle of the canvas
   mid = win.copy().mult(0.5);
@@ -38,7 +36,7 @@ function draw() {
   //clear();
 
   // get the coordinate of the mouse pointer
-  const mouse = new vec(mouseX, mouseY);
+  const mouse = vec(mouseX, mouseY);
 
   // draw a circle at the moise position.
   drawCirc([mouse]);

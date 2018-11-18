@@ -3,6 +3,14 @@
 */
 
 
+function getInd(v){
+  return JSON.stringify(v.sort());
+}
+
+function revInd(v){
+  return JSON.parse(v);
+}
+
 
 // MATH
 
