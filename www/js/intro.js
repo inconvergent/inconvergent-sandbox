@@ -23,9 +23,6 @@ function setup() {
 
   // make the canvas of size win
   createCanvas(win.x, win.y);
-
-  // assign other values
-  init(10);
 }
 
 function draw() {
