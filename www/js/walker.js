@@ -2,19 +2,21 @@
    windowHeight, windowWidth, cos, sin, random, vec, rndInCirc
 */
 
-let state, mid, win;
-
+let state;
 
 
 function init(n){
-  state.lines = linspace(n, 100, 900).map(x =>
-    [vec(x, 100), vec(x, 900)]);
+  const res = [];
+  linspace(n, 100, 900).forEach(y => {
+    res.push([vec(y, 100), vec(y, 900)]);
+    res.push([vec(100, y), vec(900, y)]);
+  });
+  return res;
 }
 
 
 function setup(){
-  //win = vec(windowHeight, windowWidth);
-  win = vec(1000, 1000);
+  const win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
   strokeWeight(2);
@@ -27,9 +29,9 @@ function setup(){
     stp,
     walker: getWalker(win.copy().mult(0.5), stp),
     inside: v => v && (v.x>0 && v.x<win.x && v.y>0 && v.y<win.y),
+    lines: init(50),
   };
 
-  init(50);
 }
 
 
@@ -49,6 +51,8 @@ function mouseClicked(){
 
 function draw(){
 
+  // every time state.walker is called we get a new position of the random
+  // walker.
   const pos = state.walker();
 
   clear();
@@ -58,11 +62,19 @@ function draw(){
     const res = [];
     state.lines.forEach(l => {
       const isect = intersect(cut, l);
+      // only do something if l is longer than 20,
+      // and there is an intersection
       if ((p5.Vector.dist(l[0], l[1]) > 20) && isect.intersect){
-        const xy = p5.Vector.lerp(cut[0], cut[1], intersect.p);
-        res.push([l[0], xy]);
-        res.push([l[1], xy]);
+        // this is point where cut and l intersect
+        const xy = p5.Vector.lerp(cut[0], cut[1], isect.p);
+        // move this point randomly
+        const rxy = rndInCirc(10, xy);
+
+        //create two new lines from l and rxy
+        res.push([l[0], rxy]);
+        res.push([l[1], rxy]);
       } else {
+        // keep the old l if there was no intersection
         res.push(l);
       }
     });
