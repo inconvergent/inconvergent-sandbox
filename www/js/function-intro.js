@@ -45,7 +45,7 @@ function draw(){
   drawCirc(circles, 10);
 
   //arrow functions can be a little confusing. but they can also make the code
-  //quite elegant once you get used to them. you can read more about arrow
+  //quite elegant, once you get used to them. you can read more about arrow
   //functions in javascript here:
   //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
 

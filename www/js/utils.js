@@ -118,10 +118,10 @@ function linePointDistance(line, v){
     return {dst: p5.Vector.dist(v, va), s: 0.0, xy: va.copy()};
   }
 
-  const t = min(1, max(0, (((v.x - va.x) * (vb.x - va.x)) +
+  const s = min(1, max(0, (((v.x - va.x) * (vb.x - va.x)) +
                            ((v.y - va.y) * (vb.y - va.y))) / l2));
-  const xy = p5.Vector.lerp(va, vb, t);
-  return {dst: p5.Vector.dist(v, xy), s: t, xy};
+  const xy = p5.Vector.lerp(va, vb, s);
+  return {dst: p5.Vector.dist(v, xy), s, xy};
 }
 
 function rotAngle(a, r){
