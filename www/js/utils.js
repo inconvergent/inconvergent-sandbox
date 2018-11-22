@@ -129,6 +129,31 @@ function rotAngle(a, r){
 }
 
 
+function ddxy(path, i){
+  const n = path.length;
+  const s = 2/(n-1);
+  const pl = path[i+1];
+  const pm = path[i];
+  const pr = path[i-1];
+  return {
+    d: pr.copy().sub(pl).mult(s),
+    dd: pr.copy().add(pl).sub(pm.copy().mult(2)).mult(s*s)
+  };
+}
+
+function kappa(path, i){
+  const n = path.length;
+  if (i<1||i>=n){
+    return 0;
+  }
+  const deriv = ddxy(path, i);
+  return Math.abs((deriv.d.x * deriv.dd.y) -
+                  (deriv.d.y * deriv.dd.x)) /
+    Math.pow((deriv.d.x * deriv.d.x) +
+             (deriv.d.y * deriv.d.y), 3/2);
+}
+
+
 // RANDOM
 
 function rndInCirc(rad, xy=vec(0.0)){
