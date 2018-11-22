@@ -23,6 +23,7 @@ function setup(){
   win = vec(1000, 1000);
   angleMode(RADIANS);
   createCanvas(win.x, win.y);
+  strokeCap(SQUARE);
   noFill();
 
   state = {
@@ -45,11 +46,11 @@ function getAcc(a, b){
 
   // distance between i and j
   let dst = dx.mag();
-  if (dst<0.01){
-    dst = 0.01;
+  if (dst<10){
+    dst = 10;
   }
   // sum up the acceleration between i and j
-  return ndx.mult(1.0/dst*dst);
+  return ndx.mult(1.0/(dst*dst));
 }
 
 
@@ -65,17 +66,17 @@ function step(trails, mouse){
       if (i===j){
         continue;
       }
-      acc.add(getAcc(curr[i].pos, curr[j].pos));
+      acc.add(getAcc(curr[i].pos, curr[j].pos).mult(5000));
     }
 
     if (state.inside(mouse)){
-      acc.add(getAcc(curr[i].pos, mouse).mult(5));
+      acc.add(getAcc(curr[i].pos, mouse).mult(10000));
     }
 
     // the new velocity is the old velocity + the acceleration +
     // a little bit of randomness
     // multiply by 0.999 to keep the velocity from growing too high.
-    const vel = curr[i].vel.copy().mult(0.999).add(acc).add(rndInCirc(1));
+    const vel = curr[i].vel.copy().add(acc).add(rndInCirc(1));
     // new position is the old position + the velocity (multiplied by step size)
     const pos = curr[i].pos.copy().add(vel.copy().mult(state.stpSize));
     // add the new position to the trail
@@ -103,7 +104,14 @@ function draw(){
   // draw trails
   strokeWeight(1);
   state.trails.forEach(his => {
-    drawPath(his.map(b => b.pos));
+    const path = his.map(b => b.pos);
+    //curve = getRange(0, path.length).map(i => kappa(path, i));
+    //for (let i=0; i<path.length-1;i++){
+    //  strokeWeight(Math.min(10, curve[i]*1000));
+    //  drawPath([path[i], path[i+1]]);
+    //}
+    drawPath(path);
+    //console.log()
   });
 }
 
