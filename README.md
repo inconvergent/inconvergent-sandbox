@@ -40,6 +40,13 @@ to: http://localhost:4000 in your browser.
 
 Download Node.js here https://nodejs.org/en/download/
 
+
+## Processing Implementation
+
+Processing versions of these demos (implemented by Lali Barrière) can be seen
+at: https://github.com/laliki/inconvergent_to_processing
+
+
 ## References and Further Reading
 
   - For other writing on generative art: https://inconvergent.net/generative
